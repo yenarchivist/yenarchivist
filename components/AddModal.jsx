@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { fetchGithubRepo } from "../lib/github";
 
 const PROJECT_OPTIONS = ["dingu", "yenarity", "github-mine", "github-repo"];
 const TYPE_OPTIONS = ["image", "portrait", "fashion", "travel", "cardnews", "prompt", "video", "poster", "repo"];
@@ -7,6 +8,16 @@ const STATUS_OPTIONS = ["test", "useful", "favorite", "deprecated"];
 const TOOL_OPTIONS = ["ChatGPT", "Midjourney", "Claude", "Gemini", "Runway", "Kling", "Sora", "GitHub", "기타"];
 
 export default function AddModal({ initial, activeProject, onSave, onClose }) {
+  const [githubLoading, setGithubLoading] = useState(false);
+
+  async function handleGithubFetch() {
+    if (!form.image_url) return;
+    setGithubLoading(true);
+    const data = await fetchGithubRepo(form.image_url);
+    if (data) setForm({ ...form, ...data });
+    setGithubLoading(false);
+  }
+  
   const [form, setForm] = useState({
     title: "",
     project: activeProject !== "all" ? activeProject : "dingu",
@@ -71,7 +82,12 @@ export default function AddModal({ initial, activeProject, onSave, onClose }) {
 
           <div className="form-row">
             <label>이미지 / URL</label>
-            <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="구글포토 or 드라이브 공유 URL" />
+            <div style={{ display: "flex", gap: "8px" }}>
+              <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="구글포토, 드라이브, 또는 GitHub URL" style={{ flex: 1 }} />
+              <button type="button" className="btn-cancel" onClick={handleGithubFetch} disabled={githubLoading}>
+                {githubLoading ? "..." : "가져오기"}
+              </button>
+            </div>
           </div>
 
           <div className="form-row">
