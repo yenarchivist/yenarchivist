@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -19,12 +20,11 @@
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   background: var(--cream);
   color: var(--brown-dark);
   min-height: 100vh;
 }
-
 .main { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
 
 /* Header */
@@ -55,7 +55,7 @@ body {
 }
 
 .logo-text {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 22px;
   font-weight: 300;
   color: var(--brown-mid);
@@ -63,7 +63,7 @@ body {
 }
 
 .add-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   font-weight: 500;
   padding: 8px 18px;
@@ -86,7 +86,7 @@ body {
 .project-nav::-webkit-scrollbar { display: none; }
 
 .project-tab {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   font-weight: 400;
   padding: 8px 16px;
@@ -117,7 +117,7 @@ body {
 .type-filters { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
 
 .type-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 12px;
   padding: 4px 12px;
   border-radius: 20px;
@@ -135,7 +135,7 @@ body {
 }
 
 .search-input {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   padding: 6px 14px;
   border: 0.5px solid var(--border-strong);
@@ -260,7 +260,7 @@ body {
   border-top: 0.5px solid var(--border);
 }
 .action-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 11px;
   padding: 4px 10px;
   border-radius: 6px;
@@ -283,7 +283,7 @@ body {
 }
 .add-btn-empty {
   margin-top: 16px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   padding: 8px 18px;
   background: var(--brown-dark);
@@ -350,7 +350,7 @@ body {
 .form-row input,
 .form-row select,
 .form-row textarea {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   padding: 8px 12px;
   border: 0.5px solid var(--border-strong);
@@ -376,7 +376,7 @@ body {
 }
 
 .btn-cancel {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   padding: 8px 18px;
   border: 0.5px solid var(--border-strong);
@@ -386,7 +386,7 @@ body {
   cursor: pointer;
 }
 .btn-save {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 13px;
   font-weight: 500;
   padding: 8px 20px;
@@ -405,7 +405,7 @@ body {
   padding-bottom: 12px;
 }
 .tag-filter-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 20px;
@@ -422,7 +422,7 @@ body {
   border-color: var(--brown-mid);
 }
 .tag-clear-btn {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Pretendard', sans-serif;
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 20px;
@@ -488,3 +488,27 @@ body {
 .detail-notes { font-size: 13px; color: var(--brown-dark); line-height: 1.7; white-space: pre-wrap; }
 .detail-url { font-size: 12px; color: var(--brown-mid); word-break: break-all; text-decoration: none; }
 .detail-url:hover { color: var(--brown-dark); text-decoration: underline; }
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .type-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .type-filters::-webkit-scrollbar { display: none; }
+  
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .tag-filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tag-filter-bar::-webkit-scrollbar { display: none; }
+
+  .main { padding: 0 14px 60px; }
+}

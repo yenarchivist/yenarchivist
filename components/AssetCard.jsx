@@ -15,7 +15,7 @@ const TYPE_EMOJI = {
 export default function AssetCard({ asset, onEdit, onDelete, onDetail }) {
   const status = STATUS_COLORS[asset.status] || { bg: "#f3f4f6", color: "#6b7280", label: asset.status };
   const emoji = TYPE_EMOJI[asset.type] || "📎";
-  const createdAt = asset.$createdAt ? new Date(asset.$createdAt).toLocaleDateString("ko-KR", { month: "short", day: "numeric" }) : null;
+  const createdAt = asset.$createdAt ? new Date(asset.$createdAt).toLocaleDateString("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit" }) : null;
 
   return (
     <div className="card">
