@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { getAssets, createAsset, deleteAsset, updateAsset } from "../lib/appwrite";
 import AssetCard from "../components/AssetCard";
 import AddModal from "../components/AddModal";
+import DetailModal from "../components/DetailModal";
 
 const PROJECTS = [
   { id: "all", label: "전체" },
@@ -13,7 +14,7 @@ const PROJECTS = [
 ];
 
 const TYPES = {
-  all: ["전체"],
+  all: ["image", "cardnews", "prompt", "video", "poster", "portrait", "fashion", "travel", "repo"],
   dingu: ["image", "cardnews", "prompt", "video", "poster"],
   yenarity: ["image", "portrait", "fashion", "travel", "prompt", "video"],
   "github-mine": ["repo"],
@@ -25,8 +26,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [activeProject, setActiveProject] = useState("all");
   const [activeType, setActiveType] = useState("all");
+  const [activeTags, setActiveTags] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const [detailTarget, setDetailTarget] = useState(null);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -73,13 +76,29 @@ export default function Home() {
     setShowModal(true);
   }
 
-  const filtered = assets.filter((a) =>
-    search
+  function toggleTag(tag) {
+    setActiveTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  }
+
+  // 전체 태그 추출
+  const allTags = [...new Set(
+    assets.flatMap(a => a.tags ? a.tags.split(",").map(t => t.trim()).filter(Boolean) : [])
+  )].sort();
+
+  const filtered = assets.filter((a) => {
+    const matchSearch = search
       ? a.title?.toLowerCase().includes(search.toLowerCase()) ||
         a.tags?.toLowerCase().includes(search.toLowerCase()) ||
-        a.notes?.toLowerCase().includes(search.toLowerCase())
-      : true
-  );
+        a.notes?.toLowerCase().includes(search.toLowerCase()) ||
+        a.prompt?.toLowerCase().includes(search.toLowerCase())
+      : true;
+    const matchTags = activeTags.length > 0
+      ? activeTags.every(tag => a.tags?.split(",").map(t => t.trim()).includes(tag))
+      : true;
+    return matchSearch && matchTags;
+  });
 
   const types = TYPES[activeProject] || TYPES.all;
 
@@ -101,7 +120,7 @@ export default function Home() {
             <button
               key={p.id}
               className={`project-tab ${activeProject === p.id ? "active" : ""}`}
-              onClick={() => { setActiveProject(p.id); setActiveType("all"); }}
+              onClick={() => { setActiveProject(p.id); setActiveType("all"); setActiveTags([]); }}
             >
               {p.label}
             </button>
@@ -111,28 +130,51 @@ export default function Home() {
 
       <div className="toolbar">
         <div className="type-filters">
-          {["all", ...types.filter(t => t !== "전체")].map((t) => (
+          <button
+            className={`type-btn ${activeType === "all" ? "active" : ""}`}
+            onClick={() => setActiveType("all")}
+          >전체</button>
+          {types.map((t) => (
             <button
               key={t}
               className={`type-btn ${activeType === t ? "active" : ""}`}
               onClick={() => setActiveType(t)}
             >
-              {t === "all" ? "전체" : t}
+              {t}
             </button>
           ))}
         </div>
         <input
           className="search-input"
-          placeholder="검색..."
+          placeholder="제목, 태그, 프롬프트 검색..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
+      {allTags.length > 0 && (
+        <div className="tag-filter-bar">
+          {allTags.map(tag => (
+            <button
+              key={tag}
+              className={`tag-filter-btn ${activeTags.includes(tag) ? "active" : ""}`}
+              onClick={() => toggleTag(tag)}
+            >
+              #{tag}
+            </button>
+          ))}
+          {activeTags.length > 0 && (
+            <button className="tag-clear-btn" onClick={() => setActiveTags([])}>
+              초기화 ✕
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="stats-bar">
         <span className="stat-item">{filtered.length}개</span>
-        {activeProject !== "all" && (
-          <span className="stat-item muted">{PROJECTS.find(p => p.id === activeProject)?.label}</span>
+        {activeTags.length > 0 && (
+          <span className="stat-item muted">태그: {activeTags.join(", ")}</span>
         )}
       </div>
 
@@ -151,6 +193,7 @@ export default function Home() {
               asset={asset}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onDetail={setDetailTarget}
             />
           ))}
         </div>
@@ -162,6 +205,14 @@ export default function Home() {
           activeProject={activeProject}
           onSave={handleSave}
           onClose={() => { setShowModal(false); setEditTarget(null); }}
+        />
+      )}
+
+      {detailTarget && (
+        <DetailModal
+          asset={detailTarget}
+          onEdit={handleEdit}
+          onClose={() => setDetailTarget(null)}
         />
       )}
     </main>
