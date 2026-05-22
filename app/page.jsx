@@ -22,6 +22,7 @@ const TYPES = {
 };
 
 export default function Home() {
+  const [showAllTags, setShowAllTags] = useState(false);
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeProject, setActiveProject] = useState("all");
@@ -31,7 +32,7 @@ export default function Home() {
   const [editTarget, setEditTarget] = useState(null);
   const [detailTarget, setDetailTarget] = useState(null);
   const [search, setSearch] = useState("");
-
+  
   useEffect(() => {
     fetchAssets();
   }, [activeProject, activeType]);
@@ -154,7 +155,7 @@ export default function Home() {
 
       {allTags.length > 0 && (
         <div className="tag-filter-bar">
-          {allTags.map(tag => (
+          {(showAllTags ? allTags : allTags.slice(0, 8)).map(tag => (
             <button
               key={tag}
               className={`tag-filter-btn ${activeTags.includes(tag) ? "active" : ""}`}
@@ -163,6 +164,14 @@ export default function Home() {
               #{tag}
             </button>
           ))}
+          {allTags.length > 8 && (
+  <button
+    className="tag-filter-btn"
+    onClick={() => setShowAllTags(prev => !prev)}
+  >
+    {showAllTags ? "접기 ↑" : `+${allTags.length - 8}개 더보기`}
+  </button>
+)}
           {activeTags.length > 0 && (
             <button className="tag-clear-btn" onClick={() => setActiveTags([])}>
               초기화 ✕
