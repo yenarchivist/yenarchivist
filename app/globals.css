@@ -503,6 +503,16 @@ body {
     gap: 10px;
   }
 
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
   .tag-filter-bar {
     flex-wrap: nowrap;
     overflow-x: auto;
