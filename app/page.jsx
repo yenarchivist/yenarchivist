@@ -115,8 +115,9 @@ export default function Home() {
             + 추가
           </button>
         </div>
-
+      
         <nav className="project-nav">
+          <a href="/calendar" className="project-tab" style={{ marginLeft: "auto" }}>📅 캘린더</a>
           {PROJECTS.map((p) => (
             <button
               key={p.id}
