@@ -83,7 +83,6 @@ export default function Home() {
     );
   }
 
-  // 전체 태그 추출
   const allTags = [...new Set(
     assets.flatMap(a => a.tags ? a.tags.split(",").map(t => t.trim()).filter(Boolean) : [])
   )].sort();
@@ -118,6 +117,7 @@ export default function Home() {
       
         <nav className="project-nav">
           <a href="/calendar" className="project-tab" style={{ marginLeft: "auto" }}>📅 캘린더</a>
+          <a href="/prompt-lab" className="project-tab">🧪 프롬프트 랩</a>
           {PROJECTS.map((p) => (
             <button
               key={p.id}
