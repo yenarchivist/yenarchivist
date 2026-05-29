@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { createAsset } from "../../lib/appwrite";
 
 function pickAnalysis(prompt) {
   const text = (prompt || "").toLowerCase();
@@ -51,6 +52,9 @@ export default function PromptLab() {
   const [selected, setSelected] = useState(null);
   const [slide, setSlide] = useState(0);
   const [copied, setCopied] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -81,12 +85,55 @@ export default function PromptLab() {
     setSelected(post);
     setSlide(0);
     setCopied("");
+    setSaved(false);
+    setSaveError("");
   }
 
   async function copyText(text, key) {
     await navigator.clipboard.writeText(text || "");
     setCopied(key);
     setTimeout(() => setCopied(""), 1400);
+  }
+
+  async function saveYenarityAsset() {
+    if (!selected || saving) return;
+    setSaving(true);
+    setSaved(false);
+    setSaveError("");
+
+    const currentImages = imageSources(selected);
+    const remix = buildYenarityRemix(selected);
+    const sourceTags = (selected.tags || []).filter(Boolean);
+    const tags = Array.from(new Set(["yenarity", "prompt-lab", "remix", ...sourceTags])).join(", ");
+    const notes = [
+      `Source: ${selected.source || "Reactor Prompt"}`,
+      selected.threadsUrl ? `Original URL: ${selected.threadsUrl}` : "",
+      selected.reactorId ? `Reactor ID: ${selected.reactorId}` : "",
+      "",
+      "Original prompt:",
+      selected.prompt || ""
+    ].filter((line) => line !== "").join("\n");
+
+    try {
+      await createAsset({
+        title: `[Yenarity Remix] ${selected.title || "Untitled"}`,
+        project: "yenarity",
+        type: "prompt",
+        image_url: currentImages[0] || "",
+        prompt: remix,
+        tool: "Prompt Lab",
+        tags,
+        status: "test",
+        notes,
+        rating: 0
+      });
+      setSaved(true);
+    } catch (error) {
+      console.error(error);
+      setSaveError("저장 실패. Appwrite 권한이나 필드 길이를 확인해야 해.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   const analysis = selected ? pickAnalysis(selected.prompt) : null;
@@ -102,7 +149,7 @@ export default function PromptLab() {
             <span>프롬프트 랩</span>
           </div>
           <h1>외부 프롬프트를 보고, 분석하고, 예나리티 감각으로 바꾸는 실험실</h1>
-          <p>Reactor Prompt 데이터를 실시간으로 읽어오고, 프롬프트가 있는 레퍼런스만 보여줘. 마음에 드는 건 나중에 본진 자산으로 저장하게 만들 거야.</p>
+          <p>Reactor Prompt 데이터를 실시간으로 읽어오고, 프롬프트가 있는 레퍼런스만 보여줘. 마음에 드는 건 본진 자산으로 저장해서 예나리티 작업에 재사용할 수 있어.</p>
         </div>
         <div className="lab-stat-card">
           <strong>{loading ? "..." : posts.length}</strong>
@@ -164,7 +211,12 @@ export default function PromptLab() {
 
               <div className="lab-section-title">Yenarity Remix Starter</div>
               <pre className="lab-prompt-box lab-remix">{remix}</pre>
-              <div className="lab-actions"><button onClick={() => copyText(remix, "remix")}>{copied === "remix" ? "복사됨!" : "예나리티 프롬프트 복사"}</button><button disabled className="lab-disabled">내 자산으로 저장 예정</button></div>
+              <div className="lab-actions">
+                <button onClick={() => copyText(remix, "remix")}>{copied === "remix" ? "복사됨!" : "예나리티 프롬프트 복사"}</button>
+                <button onClick={saveYenarityAsset} disabled={saving || saved} className={saved ? "lab-saved" : ""}>{saving ? "저장 중..." : saved ? "저장 완료" : "예나리티 자산으로 저장"}</button>
+              </div>
+              {saveError && <p className="lab-save-message error">{saveError}</p>}
+              {saved && <p className="lab-save-message">저장됐어. 메인에서 ✦ 예나리티 / prompt / test로 확인해봐.</p>}
             </div>
           </div>
         </div>
