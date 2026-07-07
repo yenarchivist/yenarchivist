@@ -25,6 +25,14 @@ const TYPES = {
   "github-repo": ["repo"],
 };
 
+const PROJECT_H1 = {
+  all: "예나의 아카이브 — 띵구·예나리티 이미지와 프롬프트",
+  dingu: "DINGU 아카이브 — 보더콜리 CEO 띵구의 콘텐츠",
+  yenarity: "YENARITY 아카이브 — AI 버추얼 모델 예나리티",
+  "github-mine": "My Repo — 직접 만든 GitHub 저장소",
+  "github-repo": "Good Repo — 좋은 GitHub 저장소 레퍼런스",
+};
+
 const LIKES_KEY = "yenarchivist:likes";
 const VIEW_KEY = "yenarchivist:view";
 const MAX_COMPARE = 3;
@@ -161,6 +169,7 @@ export default function ArchivePage({ initialProject = "all" }) {
 
   return (
     <main className="main" data-project={activeProject}>
+      <h1 className="sr-only">{PROJECT_H1[activeProject] || PROJECT_H1.all}</h1>
       <header className="header">
         <div className="header-inner">
           <a href="/" className="logo" aria-label="yenarchivist home">
