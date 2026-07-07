@@ -23,6 +23,7 @@ export default function AddModal({ initial, activeProject, onSave, onClose }) {
     project: activeProject !== "all" ? activeProject : "dingu",
     type: "image",
     image_url: "",
+    threads_url: "",
     prompt: "",
     tool: "",
     tags: "",
@@ -42,6 +43,8 @@ export default function AddModal({ initial, activeProject, onSave, onClose }) {
   function handleSubmit(e) {
     e.preventDefault();
     const data = { ...form, rating: Number(form.rating) };
+    // threads_url 속성이 Appwrite 컬렉션에 없어도 저장이 깨지지 않도록 빈 값은 제거
+    if (!data.threads_url) delete data.threads_url;
     delete data.$id;
     delete data.$createdAt;
     delete data.$updatedAt;
@@ -81,13 +84,22 @@ export default function AddModal({ initial, activeProject, onSave, onClose }) {
           </div>
 
           <div className="form-row">
-            <label>이미지 / URL</label>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="구글포토, 드라이브, 또는 GitHub URL" style={{ flex: 1 }} />
-              <button type="button" className="btn-cancel" onClick={handleGithubFetch} disabled={githubLoading}>
-                {githubLoading ? "..." : "가져오기"}
-              </button>
-            </div>
+            <label>이미지 URL (한 줄에 하나씩, 여러 장 가능)</label>
+            <textarea
+              name="image_url"
+              value={form.image_url}
+              onChange={handleChange}
+              rows={3}
+              placeholder={"https://...R2/이미지1.jpg\nhttps://...R2/이미지2.jpg\n(repo 타입은 GitHub URL 한 줄)"}
+            />
+            <button type="button" className="btn-cancel" style={{ alignSelf: "flex-start" }} onClick={handleGithubFetch} disabled={githubLoading}>
+              {githubLoading ? "..." : "GitHub 정보 가져오기"}
+            </button>
+          </div>
+
+          <div className="form-row">
+            <label>Threads 링크 (선택)</label>
+            <input name="threads_url" value={form.threads_url || ""} onChange={handleChange} placeholder="https://www.threads.com/@.../post/..." />
           </div>
 
           <div className="form-row">

@@ -1,61 +1,77 @@
 "use client";
 
-const STATUS_COLORS = {
-  favorite: { bg: "#fef3c7", color: "#92400e", label: "⭐ favorite" },
-  useful: { bg: "#d1fae5", color: "#065f46", label: "useful" },
-  test: { bg: "#dbeafe", color: "#1e40af", label: "test" },
-  deprecated: { bg: "#fee2e2", color: "#991b1b", label: "deprecated" },
-};
+import { IconHeart, IconCamera } from "./icons";
 
 const TYPE_EMOJI = {
   image: "🖼", portrait: "🪞", fashion: "👗", travel: "✈️",
   cardnews: "📰", prompt: "✏️", video: "🎬", poster: "🎨", repo: "⌥",
 };
 
-export default function AssetCard({ asset, onEdit, onDelete, onDetail }) {
-  const status = STATUS_COLORS[asset.status] || { bg: "#f3f4f6", color: "#6b7280", label: asset.status };
+export default function AssetCard({ asset, liked, onLike, onOpen }) {
+  const cover = asset.images[0];
   const emoji = TYPE_EMOJI[asset.type] || "📎";
-  const createdAt = asset.$createdAt ? new Date(asset.$createdAt).toLocaleDateString("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit" }) : null;
+  const count = asset.images.length;
 
   return (
-    <div className="card">
-      <div className="card-thumb" onClick={() => onDetail(asset)} style={{ cursor: "pointer" }}>
-        {asset.image_url ? (
-          <img src={asset.image_url} alt={asset.title} className="card-img" onError={(e) => { e.target.style.display="none"; e.target.nextSibling.style.display="flex"; }} />
+    <article
+      className="card"
+      data-proj={asset.project}
+      onClick={() => onOpen(asset)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter") onOpen(asset); }}
+    >
+      <div className="card-thumb">
+        {cover ? (
+          <img
+            src={cover}
+            alt={asset.title}
+            className="card-img"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const ph = e.currentTarget.parentElement.querySelector(".card-placeholder");
+              if (ph) ph.style.display = "flex";
+            }}
+          />
         ) : null}
-        <div className="card-placeholder" style={{ display: asset.image_url ? "none" : "flex" }}>{emoji}</div>
-        {asset.status && (
-          <span className="card-status" style={{ background: status.bg, color: status.color }}>
-            {status.label}
+        <div className="card-placeholder" style={{ display: cover ? "none" : "flex" }}>{emoji}</div>
+
+        <button
+          className={`card-like ${liked ? "on" : ""}`}
+          aria-label={liked ? "좋아요 취소" : "좋아요"}
+          onClick={(e) => { e.stopPropagation(); onLike(asset.id); }}
+        >
+          <IconHeart filled={liked} />
+        </button>
+
+        {count > 0 && (
+          <span className="card-count" aria-label={`이미지 ${count}장`}>
+            <IconCamera />
+            {count}
           </span>
         )}
-        {createdAt && <span className="card-date">{createdAt}</span>}
       </div>
 
-      <div className="card-body" onClick={() => onDetail(asset)} style={{ cursor: "pointer" }}>
-        <div className="card-title">{asset.title || "제목 없음"}</div>
-        <div className="card-meta">
-          {asset.tool && <span className="meta-chip">{asset.tool}</span>}
-          {asset.type && <span className="meta-chip">{asset.type}</span>}
+      <div className="card-body">
+        <div className="card-no">
+          <span>NO. {asset.no}</span>
+          <span>{count > 0 ? `${count} IMG` : asset.type.toUpperCase()}</span>
         </div>
-        {asset.tags && (
+        <h3 className="card-title">{asset.title}</h3>
+        {asset.tags.length > 0 && (
           <div className="card-tags">
-            {asset.tags.split(",").slice(0, 3).map((t) => (
-              <span key={t} className="tag">{t.trim()}</span>
+            {asset.tags.slice(0, 3).map((t) => (
+              <span key={t} className="tag">{t}</span>
             ))}
-            {asset.tags.split(",").length > 3 && <span className="tag">+{asset.tags.split(",").length - 3}</span>}
+            {asset.tags.length > 3 && <span className="tag tag-more">+{asset.tags.length - 3}</span>}
           </div>
         )}
-        {asset.prompt && (
-          <div className="card-prompt">{asset.prompt.slice(0, 60)}{asset.prompt.length > 60 ? "..." : ""}</div>
-        )}
+        <div className="card-extra">
+          {asset.prompt && <p className="card-prompt">{asset.prompt}</p>}
+          {asset.dateDisplay && <span className="card-date-text">{asset.dateDisplay}</span>}
+        </div>
       </div>
-
-      <div className="card-actions">
-        <button className="action-btn" onClick={() => onDetail(asset)}>보기</button>
-        <button className="action-btn" onClick={() => onEdit(asset)}>수정</button>
-        <button className="action-btn danger" onClick={() => onDelete(asset.$id)}>삭제</button>
-      </div>
-    </div>
+    </article>
   );
 }
